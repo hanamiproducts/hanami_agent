@@ -27,7 +27,7 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
                     "content": text
                 }));
             },
-            ChatMessage::ToolCalls(calls) => {
+            ChatMessage::ToolCalls { calls, .. } => {
                 let blocks: Vec<Value> = calls.iter().map(|c| json!({
                     "type": "tool_use",
                     "id": c.id,
@@ -116,7 +116,10 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
     
     }else {
         
-        Ok(Reply::ToolCalls(calls))
+        Ok(Reply::ToolCalls {
+            calls,
+            reasoning: None,
+        })
     
     }
 

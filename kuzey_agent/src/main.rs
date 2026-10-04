@@ -81,7 +81,7 @@ async fn main() {
                     history.push(ChatMessage::Assistant(text));
                     break;
                 }
-                Ok(Reply::ToolCalls(calls)) => {
+                Ok(Reply::ToolCalls { calls, reasoning }) => {
                     let mut results = Vec::new();
                     for call in &calls {
                         println!("[tool] {} {}", call.name, call.args);
@@ -92,7 +92,7 @@ async fn main() {
                             output,
                         });
                     }
-                    history.push(ChatMessage::ToolCalls(calls));
+                    history.push(ChatMessage::ToolCalls { calls, reasoning });
                     //This part is kinda wierd. why not push results?
                     history.extend(results);
                 }

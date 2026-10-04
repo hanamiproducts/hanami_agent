@@ -1,4 +1,6 @@
 mod anthropic;
+mod deepseek;
+mod glm;
 mod google;
 mod ollama;
 mod openai;
@@ -12,10 +14,19 @@ pub enum ProviderKind {
     Anthropic,
     Google,
     OpenAI,
+    Deepseek,
+    GLM,
 }
 
 impl ProviderKind {
-    pub const ALL: [ProviderKind; 4] = [Self::Ollama, Self::Anthropic, Self::Google, Self::OpenAI];
+    pub const ALL: [ProviderKind; 6] = [
+        Self::Ollama,
+        Self::Anthropic,
+        Self::Google,
+        Self::OpenAI,
+        Self::Deepseek,
+        Self::GLM,
+    ];
 
     /// Models offered in the menu for this provider.
     pub fn models(&self) -> Vec<&'static str> {
@@ -24,6 +35,8 @@ impl ProviderKind {
             Self::Anthropic => anthropic::all_available_models(),
             Self::Google => google::all_available_models(),
             Self::OpenAI => openai::all_available_models(),
+            Self::Deepseek => deepseek::all_available_models(),
+            Self::GLM => glm::all_available_models(),
         }
     }
 
@@ -46,6 +59,8 @@ impl std::fmt::Display for ProviderKind {
             Self::Anthropic => "anthropic",
             Self::Google => "google",
             Self::OpenAI => "openai",
+            Self::Deepseek => "deepseek",
+            Self::GLM => "glm",
         };
         write!(f, "{name}")
     }
@@ -80,13 +95,20 @@ impl ProviderConfig {
 
 pub enum Reply {
     Text(String),
-    ToolCalls(Vec<ToolCall>),
+    // reasoning: the model's thinking for this whole turn (Deepseek must get it back).
+    ToolCalls {
+        calls: Vec<ToolCall>,
+        reasoning: Option<String>,
+    },
 }
 
 pub enum ChatMessage {
     User(String),
     Assistant(String),
-    ToolCalls(Vec<ToolCall>),
+    ToolCalls {
+        calls: Vec<ToolCall>,
+        reasoning: Option<String>,
+    },
     ToolResult {
         id: Option<String>,
         name: String,
@@ -104,5 +126,7 @@ pub async fn send(
         ProviderKind::Ollama => ollama::send(config, history, tools).await,
         ProviderKind::OpenAI => openai::send(config, history, tools).await,
         ProviderKind::Anthropic => anthropic::send(config, history, tools).await,
+        ProviderKind::Deepseek => deepseek::send(config, history, tools).await,
+        ProviderKind::GLM => glm::send(config, history, tools).await,
     }
 }

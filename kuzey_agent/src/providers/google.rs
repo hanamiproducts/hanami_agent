@@ -42,7 +42,7 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
             ChatMessage::Assistant(text) => messages.push(Message::model(text)),
 
             // The model asked for tools: one "model" message holding one part per call.
-            ChatMessage::ToolCalls(calls) => {
+            ChatMessage::ToolCalls { calls, .. } => {
                 //c is the opbject iterated. than its mapped with function calls we want. name is
                 //barrowd and args is cloned. not sure why I did that. maybe refactorable. We can
                 //also clone the name. 
@@ -125,6 +125,9 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
     if calls.is_empty() {
         Ok(Reply::Text(response.text()))
     } else {
-        Ok(Reply::ToolCalls(calls))
+        Ok(Reply::ToolCalls {
+            calls,
+            reasoning: None,
+        })
     }
 }

@@ -30,7 +30,7 @@ pub(super) async fn send(
                     "content": text
                 }));
             }
-            ChatMessage::ToolCalls(calls) => {
+            ChatMessage::ToolCalls { calls, .. } => {
                 let tool_calls: Vec<Value> = calls
                     .iter()
                     .map(|c| {
@@ -98,7 +98,10 @@ pub(super) async fn send(
             })
             .collect();
         if !calls.is_empty() {
-            return Ok(Reply::ToolCalls(calls));
+            return Ok(Reply::ToolCalls {
+                calls,
+                reasoning: None,
+            });
         };
     };
 

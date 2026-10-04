@@ -37,7 +37,7 @@ pub(super) async fn send(
             // One "function_call" item per call, not one message holding all calls.
             // Only call_id is sent back: sending the item's own "fc_..." id would make
             // OpenAI expect the matching reasoning item too.
-            ChatMessage::ToolCalls(calls) => {
+            ChatMessage::ToolCalls { calls, .. } => {
                 for c in calls {
                     input.push(json!({
                         "type": "function_call",
@@ -125,6 +125,9 @@ pub(super) async fn send(
     if calls.is_empty() {
         Ok(Reply::Text(answer))
     } else {
-        Ok(Reply::ToolCalls(calls))
+        Ok(Reply::ToolCalls {
+            calls,
+            reasoning: None,
+        })
     }
 }
