@@ -1,7 +1,6 @@
 mod read_file;
 mod run_command;
 mod time;
-mod web_search;
 mod write_file;
 
 use inquire::{Select, error::InquireError};
@@ -28,13 +27,11 @@ pub fn specs() -> Vec<ToolSpec> {
         read_file::spec(),
         write_file::spec(),
         run_command::spec(),
-        //Added but under construction.
-        web_search::spec(),
     ]
 }
 
 fn needs_aproval(name: &str) -> bool {
-    matches!(name, "write_file" | "run_command" | "web_search")
+    matches!(name, "write_file" | "run_command")
 }
 
 pub async fn execute(call: &ToolCall) -> String {
@@ -71,7 +68,6 @@ pub async fn execute(call: &ToolCall) -> String {
         "read_file" => read_file::run(&call.args).await,
         "write_file" => write_file::run(&call.args).await,
         "run_command" => run_command::run(&call.args).await,
-        "web_search" => web_search::run(&call.args).await, // under production.
         other => format!("Error: unknown tool '{other}'"),
     }
 }
