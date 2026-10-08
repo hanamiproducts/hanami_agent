@@ -15,6 +15,8 @@ your machine (read and write files, run shell commands) to get things done.
 - Multi-turn chat with tool calling (up to 10 tool rounds per message).
 - `@path/to/file` in a message attaches that file, with path autocomplete.
 - `write_file` and `run_command` ask for your approval before they run.
+- Minimal by design: no web search tool. The model can use `curl` through `run_command` when it
+  needs the web.
 
 ## Providers
 
@@ -24,8 +26,8 @@ your machine (read and write files, run shell commands) to get things done.
 | Anthropic Claude | ✅ chat + tools |
 | OpenAI (Responses API) | ✅ chat + tools |
 | Ollama (local, `localhost:11434`) | ✅ chat + tools |
-| DeepSeek | 🚧 in testing |
-| GLM | 🚧 in progress |
+| DeepSeek | ✅ chat + tools |
+| GLM (Z.ai) | ✅ chat + tools |
 
 ## Tools
 
@@ -35,7 +37,6 @@ your machine (read and write files, run shell commands) to get things done.
 | `read_file` | Reads a text file |
 | `write_file` | Creates or overwrites a file (asks first) |
 | `run_command` | Runs a shell command, 30 s timeout (asks first) |
-| `web_search` | 🚧 in progress |
 
 ## Quick start
 
@@ -53,10 +54,18 @@ Lines starting with `[tool]` show the tools the model runs. Type `/exit` to quit
 `run_command` uses `sh`, so it works on Linux and macOS but not on Windows yet. Even with the
 approval prompts, it's best to run Kuzey in a folder you don't mind changing.
 
+Requests to providers time out after 120 s. GLM uses the standard Z.ai endpoint; GLM Coding Plan
+keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
+
+## Branches
+
+- `main` is always the usable version. Clone this one.
+- `dev` is where new work is tested before it is merged into `main`.
+
 ## Roadmap
 
 - [x] Chat loop, tool calling, approval prompts, `@file` mentions
-- [x] Gemini, Claude, OpenAI and Ollama providers
-- [ ] DeepSeek and GLM providers
-- [ ] `web_search` and `edit_file` tools
+- [x] Gemini, Claude, OpenAI, Ollama, DeepSeek and GLM providers
+- [ ] `edit_file` tool
+- [ ] API keys from environment variables
 - [ ] Windows support, streaming responses, better tests
