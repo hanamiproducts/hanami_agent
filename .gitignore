@@ -46,3 +46,8 @@ Thumbs.db
 questions_and_answers.md
 git_moves.md
 fixed_bugs.md
+
+# ---- Local test output ----
+# Files the models create while testing write_file / run_command
+write_file_trial/
+*_trial/
