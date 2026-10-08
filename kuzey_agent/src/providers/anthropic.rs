@@ -1,15 +1,22 @@
-use super::{ProviderConfig, ChatMessage, Reply};
-use crate::tools::{ToolSpec, ToolCall};
-use serde_json::{json, Value};
+use super::{ChatMessage, ProviderConfig, Reply};
+use crate::tools::{ToolCall, ToolSpec};
+use serde_json::{Value, json};
+use std::time::Duration;
 
 pub(super) fn all_available_models() -> Vec<&'static str> {
     vec!["claude-haiku-4-5-20251001"]
 }
 
 //Still need to integrate the tools. For an example check ollama.rs"
-pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools: &[ToolSpec]) -> Result<Reply, Box<dyn std::error::Error>> {
-
-    let api_key = config.api_key.as_deref().ok_or("Anthropic needs an api key!")?;
+pub(super) async fn send(
+    config: &ProviderConfig,
+    history: &[ChatMessage],
+    tools: &[ToolSpec],
+) -> Result<Reply, Box<dyn std::error::Error>> {
+    let api_key = config
+        .api_key
+        .as_deref()
+        .ok_or("Anthropic needs an api key!")?;
 
     let mut messages: Vec<Value> = Vec::new();
 
@@ -17,59 +24,67 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
         match entry {
             ChatMessage::User(text) => {
                 messages.push(json!({
-                    "role": "user", 
+                    "role": "user",
                     "content": text
                 }));
-            },
+            }
             ChatMessage::Assistant(text) => {
                 messages.push(json!({
-                    "role": "assistant", 
+                    "role": "assistant",
                     "content": text
                 }));
-            },
+            }
             ChatMessage::ToolCalls { calls, .. } => {
-                let blocks: Vec<Value> = calls.iter().map(|c| json!({
-                    "type": "tool_use",
-                    "id": c.id,
-                    "name": c.name,
-                    "input": c.args
-                })).collect();
+                let blocks: Vec<Value> = calls
+                    .iter()
+                    .map(|c| {
+                        json!({
+                            "type": "tool_use",
+                            "id": c.id,
+                            "name": c.name,
+                            "input": c.args
+                        })
+                    })
+                    .collect();
 
                 messages.push(json!({
                     "role": "assistant",
                     "content": blocks,
                 }));
-            },
-            ChatMessage::ToolResult {id, output, ..} => {
+            }
+            ChatMessage::ToolResult { id, output, .. } => {
                 let block = json!({
                     "type": "tool_result",
                     "tool_use_id": id,
                     "content": output
                 });
-                //This is how anthropic wants. Wierd shiii. 
+                //This is how anthropic wants. Wierd shiii.
                 match messages.last_mut() {
                     Some(last) if last["content"][0]["type"] == "tool_result" => {
                         last["content"].as_array_mut().unwrap().push(block);
-                    },
+                    }
 
-                    _ => {messages.push(json!({
+                    _ => {
+                        messages.push(json!({
                         "role": "user",
                         "content": [block]
                         }));
                     }
-
+                }
             }
-            }
-
         }
     }
 
-    let tool_list: Vec<Value> = tools.iter().map(|t| json!({
-        "name": t.name,
-        "description": t.description,
-        "input_schema": t.parameters,
-    })).collect();
-
+    let tool_list: Vec<Value> = tools
+        .iter()
+        .map(|t| {
+            json!({
+                "name": t.name,
+                "description": t.description,
+                "input_schema": t.parameters,
+            })
+        })
+        .collect();
 
     let body = json!({
         "model": config.model,
@@ -81,6 +96,7 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
 
     let response: Value = reqwest::Client::new()
         .post("https://api.anthropic.com/v1/messages")
+        .timeout(Duration::from_secs(120))
         .header("x-api-key", api_key)
         .header("anthropic-version", "2023-06-01")
         .json(&body)
@@ -89,7 +105,9 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
         .json()
         .await?;
 
-    println!("{response:#}");
+    if let Some(msg) = response["error"]["message"].as_str() {
+        return Err(format!("Anthropic error: {msg}").into());
+    }
 
     let mut answer = String::new();
     let mut calls: Vec<ToolCall> = Vec::new();
@@ -100,9 +118,9 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
                 answer.push_str(block["text"].as_str().unwrap_or(""));
             } else if block["type"] == "tool_use" {
                 calls.push(ToolCall {
-                    id: block["id"].as_str().map(|s| s.to_string()),//What is this map?
-                    name: block["name"].as_str().unwrap_or("").to_string(),//So converting to &str
-                    //then to String? 
+                    id: block["id"].as_str().map(|s| s.to_string()), //What is this map?
+                    name: block["name"].as_str().unwrap_or("").to_string(), //So converting to &str
+                    //then to String?
                     args: block["input"].clone(),
                     signature: None, //Gemini only.
                 });
@@ -110,17 +128,12 @@ pub(super) async fn send(config: &ProviderConfig, history: &[ChatMessage], tools
         }
     }
 
-    if calls.is_empty(){
-        
+    if calls.is_empty() {
         Ok(Reply::Text(answer))
-    
-    }else {
-        
+    } else {
         Ok(Reply::ToolCalls {
             calls,
             reasoning: None,
         })
-    
     }
-
 }

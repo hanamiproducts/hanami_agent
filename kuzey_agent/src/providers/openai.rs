@@ -1,6 +1,7 @@
 use super::{ChatMessage, ProviderConfig, Reply};
 use crate::tools::{ToolCall, ToolSpec};
 use serde_json::{Value, json};
+use std::time::Duration;
 
 //There should be a way to dynamically call the models. but currently its static and points a place
 //at binary.
@@ -81,6 +82,7 @@ pub(super) async fn send(
     //Check the endooint validity from https://developers.openai.com/api/docs?lang=curl
     let response: Value = client
         .post("https://api.openai.com/v1/responses")
+        .timeout(Duration::from_secs(120))
         .bearer_auth(api_key)
         .json(&body)
         .send()

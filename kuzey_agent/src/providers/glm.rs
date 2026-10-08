@@ -1,6 +1,7 @@
 use super::{ChatMessage, ProviderConfig, Reply};
 use crate::tools::{ToolCall, ToolSpec};
 use serde_json::{Value, json};
+use std::time::Duration;
 
 // Model ids are lowercase in the API.
 pub(super) fn all_available_models() -> Vec<&'static str> {
@@ -93,6 +94,7 @@ pub(super) async fn send(
     // Coding plan keys use https://api.z.ai/api/coding/paas/v4/chat/completions instead.
     let response: Value = client
         .post("https://api.z.ai/api/paas/v4/chat/completions")
+        .timeout(Duration::from_secs(120))
         .bearer_auth(api_key)
         .json(&body)
         .send()

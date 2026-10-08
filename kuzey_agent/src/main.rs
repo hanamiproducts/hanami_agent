@@ -74,11 +74,15 @@ async fn main() {
 
         // Inner loop: keep going while the model asks for tools.
         // It ends when the model answers with text (or after 10 rounds).
+
+        let mut was_tool_call_sucsefull: bool = false;
+
         for _ in 0..10 {
             match providers::send(&provider_details, &history, &tool_specs).await {
                 Ok(Reply::Text(text)) => {
                     println!("{text}");
                     history.push(ChatMessage::Assistant(text));
+                    was_tool_call_sucsefull = true;
                     break;
                 }
                 Ok(Reply::ToolCalls { calls, reasoning }) => {
@@ -102,9 +106,14 @@ async fn main() {
                     // ToolCalls without its ToolResult, and OpenAI/Anthropic reject such a
                     // history on every later request. Drop the whole turn instead.
                     history.truncate(turn_start);
+                    was_tool_call_sucsefull = true;
                     break;
                 }
             }
+        }
+
+        if !was_tool_call_sucsefull {
+            println!("ToolCallTrials was not sucsesfull! Check the configuration!");
         }
     }
 }

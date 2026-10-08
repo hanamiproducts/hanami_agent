@@ -1,6 +1,7 @@
 use super::{ChatMessage, ProviderConfig, Reply};
 use crate::tools::{ToolCall, ToolSpec};
 use serde_json::{Value, json};
+use std::time::Duration;
 
 pub(super) fn all_available_models() -> Vec<&'static str> {
     vec!["qwen3.8:latest", "ornith:9b"]
@@ -74,18 +75,29 @@ pub(super) async fn send(
         "model": _config.model,
         "messages": messages,
         "tools": tool_list,
-        "stream": false
+        "stream": false,
+        "options": {
+            "temperature":_config.temp,
+            "top_p": _config.top_p,
+            "top_k": _config.top_k,
+        }
     });
 
     let client = reqwest::Client::new();
 
     let response: Value = client
         .post("http://localhost:11434/api/chat")
+        .timeout(Duration::from_secs(120))
         .json(&body) // turn body to JSON for the request
         .send()
         .await? //Waits for the server and return on error.
         .json()
         .await?; //read the reply body as json. 
+
+    // Ollama sends the error as a plain string: {"error": "model 'x' not found"}.
+    if let Some(msg) = response["error"].as_str() {
+        return Err(format!("Ollama error: {msg}").into());
+    }
 
     if let Some(calls) = response["message"]["tool_calls"].as_array() {
         let calls: Vec<ToolCall> = calls

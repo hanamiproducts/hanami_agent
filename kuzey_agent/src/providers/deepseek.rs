@@ -1,6 +1,7 @@
 use super::{ChatMessage, ProviderConfig, Reply};
 use crate::tools::{ToolCall, ToolSpec};
 use serde_json::{Value, json};
+use std::time::Duration;
 
 // returns all the valid deepseek models.
 pub(super) fn all_available_models() -> Vec<&'static str> {
@@ -99,6 +100,7 @@ pub(super) async fn send(
 
     let response: Value = client
         .post("https://api.deepseek.com/chat/completions")
+        .timeout(Duration::from_secs(120))
         .bearer_auth(api_key)
         .json(&body)
         .send()
@@ -109,8 +111,6 @@ pub(super) async fn send(
     if let Some(msg) = response["error"]["message"].as_str() {
         return Err(format!("Deepseek error {msg}").into());
     }
-
-    //println!("response: {}", response);
 
     let message = &response["choices"][0]["message"];
     if message.is_null() {
