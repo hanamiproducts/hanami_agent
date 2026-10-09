@@ -7,7 +7,7 @@ A terminal AI agent written from scratch in Rust. You chat with a model, and it 
 your machine (read and write files, run shell commands) to get things done.
 
 > **Done with curiosity and Rust.** This is a learning project. The code is full of notes and open
-> questions, and it is not hardened.
+> questions, and it is not hardened. All PR's are more than welcom.
 
 ## Features
 
@@ -20,23 +20,23 @@ your machine (read and write files, run shell commands) to get things done.
 
 ## Providers
 
-| Provider | Status |
-|---|---|
-| Google Gemini | ✅ chat + tools |
-| Anthropic Claude | ✅ chat + tools |
-| OpenAI (Responses API) | ✅ chat + tools |
+| Provider                          | Status          |
+| --------------------------------- | --------------- |
+| Google Gemini                     | ✅ chat + tools |
+| Anthropic Claude                  | ✅ chat + tools |
+| OpenAI (Responses API)            | ✅ chat + tools |
 | Ollama (local, `localhost:11434`) | ✅ chat + tools |
-| DeepSeek | ✅ chat + tools |
-| GLM (Z.ai) | ✅ chat + tools |
+| DeepSeek                          | ✅ chat + tools |
+| GLM (Z.ai)                        | ✅ chat + tools |
 
 ## Tools
 
-| Tool | What it does |
-|---|---|
-| `get_current_time` | Returns the local date and time |
-| `read_file` | Reads a text file |
-| `write_file` | Creates or overwrites a file (asks first) |
-| `run_command` | Runs a shell command, 30 s timeout (asks first) |
+| Tool               | What it does                                    |
+| ------------------ | ----------------------------------------------- |
+| `get_current_time` | Returns the local date and time                 |
+| `read_file`        | Reads a text file                               |
+| `write_file`       | Creates or overwrites a file (asks first)       |
+| `run_command`      | Runs a shell command, 30 s timeout (asks first) |
 
 ## Quick start
 
