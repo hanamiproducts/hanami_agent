@@ -1,7 +1,7 @@
 # <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Kuzey Agent
 
 [![CI](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.1.0-blue)
+[![version](https://img.shields.io/badge/version-0.1.0-blue)](CHANGELOG.md)
 
 A terminal AI agent written from scratch in Rust. You chat with a model, and it can use tools on
 your machine (read and write files, run shell commands) to get things done.
@@ -66,6 +66,18 @@ keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
 
 - [x] Chat loop, tool calling, approval prompts, `@file` mentions
 - [x] Gemini, Claude, OpenAI, Ollama, DeepSeek and GLM providers
-- [ ] `edit_file` tool
-- [ ] API keys from environment variables
-- [ ] Windows support, streaming responses, better tests
+- [x] Request timeouts, provider error messages
+
+Next, in order. The goal is a small, sharp agent: fewer tools and a better loop, not more features.
+
+- [ ] `edit_file` tool: replace an exact `old_string` with `new_string` instead of rewriting the
+      whole file
+- [ ] API keys from environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, ...), asking only
+      when none is set
+- [ ] Load `AGENTS.md` from the current folder into the system prompt, plus the working directory
+      and OS
+- [ ] Streaming responses, starting with the Chat Completions providers (DeepSeek, GLM, Ollama)
+- [ ] Chat commands: `/clear`, `/model`, `/save` and `/load`
+- [ ] "Always allow" option in the approval prompt, per tool and per session
+- [ ] Trim the tool set: drop `get_current_time` (the model can run `date`)
+- [ ] Windows support, better tests

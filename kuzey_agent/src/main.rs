@@ -8,7 +8,8 @@ use providers::{ChatMessage, ProviderConfig, ProviderKind, Reply};
 
 #[tokio::main]
 async fn main() {
-    println!("Kuzey Agent 0.1.0");
+    // The version comes from Cargo.toml at compile time, so it is only written in one place.
+    println!("Kuzey Agent {}", env!("CARGO_PKG_VERSION"));
 
     // Ctrl+C / Esc in any prompt returns Err: exit cleanly instead of panicking.
     let Ok(kind) = Select::new(
