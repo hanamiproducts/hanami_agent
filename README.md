@@ -1,13 +1,13 @@
 # <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Kuzey Agent
 
-[![CI](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml)
+[![CI](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 
 A terminal AI agent written from scratch in Rust. You chat with a model, and it can use tools on
 your machine (read and write files, run shell commands) to get things done.
 
 > **Done with curiosity and Rust.** This is a learning project. The code is full of notes and open
-> questions, and it is not hardened. All PR's are more than welcom.
+> questions, and it is not hardened. PRs are very welcome.
 
 ## Features
 
@@ -43,8 +43,8 @@ your machine (read and write files, run shell commands) to get things done.
 Needs Rust 1.85 or newer ([rustup](https://rustup.rs)).
 
 ```bash
-git clone https://github.com/samliumay/kuzey_agent.git
-cd kuzey_agent/kuzey_agent
+git clone https://github.com/samliumay/hanami_agent.git
+cd hanami_agent/kuzey_agent
 cargo run --release
 ```
 
