@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: kuzey_agent
+    working-directory: hanami_agent
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,7 +25,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: kuzey_agent -> target
+          workspaces: hanami_agent -> target
 
       - name: Build
         run: cargo build --locked

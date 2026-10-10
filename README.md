@@ -1,13 +1,13 @@
 # <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Kuzey Agent
 
-[![CI](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/kuzey_agent/actions/workflows/ci.yml)
-[![version](https://img.shields.io/badge/version-0.1.0-blue)](CHANGELOG.md)
+[![CI](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml)
+![version](https://img.shields.io/badge/version-0.1.0-blue)
 
 A terminal AI agent written from scratch in Rust. You chat with a model, and it can use tools on
 your machine (read and write files, run shell commands) to get things done.
 
 > **Done with curiosity and Rust.** This is a learning project. The code is full of notes and open
-> questions, and it is not hardened.
+> questions, and it is not hardened. PRs are very welcome.
 
 ## Features
 
@@ -20,31 +20,31 @@ your machine (read and write files, run shell commands) to get things done.
 
 ## Providers
 
-| Provider | Status |
-|---|---|
-| Google Gemini | ✅ chat + tools |
-| Anthropic Claude | ✅ chat + tools |
-| OpenAI (Responses API) | ✅ chat + tools |
+| Provider                          | Status          |
+| --------------------------------- | --------------- |
+| Google Gemini                     | ✅ chat + tools |
+| Anthropic Claude                  | ✅ chat + tools |
+| OpenAI (Responses API)            | ✅ chat + tools |
 | Ollama (local, `localhost:11434`) | ✅ chat + tools |
-| DeepSeek | ✅ chat + tools |
-| GLM (Z.ai) | ✅ chat + tools |
+| DeepSeek                          | ✅ chat + tools |
+| GLM (Z.ai)                        | ✅ chat + tools |
 
 ## Tools
 
-| Tool | What it does |
-|---|---|
-| `get_current_time` | Returns the local date and time |
-| `read_file` | Reads a text file |
-| `write_file` | Creates or overwrites a file (asks first) |
-| `run_command` | Runs a shell command, 30 s timeout (asks first) |
+| Tool               | What it does                                    |
+| ------------------ | ----------------------------------------------- |
+| `get_current_time` | Returns the local date and time                 |
+| `read_file`        | Reads a text file                               |
+| `write_file`       | Creates or overwrites a file (asks first)       |
+| `run_command`      | Runs a shell command, 30 s timeout (asks first) |
 
 ## Quick start
 
 Needs Rust 1.85 or newer ([rustup](https://rustup.rs)).
 
 ```bash
-git clone https://github.com/samliumay/kuzey_agent.git
-cd kuzey_agent/kuzey_agent
+git clone https://github.com/samliumay/hanami_agent.git
+cd hanami_agent/kuzey_agent
 cargo run --release
 ```
 
@@ -66,18 +66,6 @@ keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
 
 - [x] Chat loop, tool calling, approval prompts, `@file` mentions
 - [x] Gemini, Claude, OpenAI, Ollama, DeepSeek and GLM providers
-- [x] Request timeouts, provider error messages
-
-Next, in order. The goal is a small, sharp agent: fewer tools and a better loop, not more features.
-
-- [ ] `edit_file` tool: replace an exact `old_string` with `new_string` instead of rewriting the
-      whole file
-- [ ] API keys from environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, ...), asking only
-      when none is set
-- [ ] Load `AGENTS.md` from the current folder into the system prompt, plus the working directory
-      and OS
-- [ ] Streaming responses, starting with the Chat Completions providers (DeepSeek, GLM, Ollama)
-- [ ] Chat commands: `/clear`, `/model`, `/save` and `/load`
-- [ ] "Always allow" option in the approval prompt, per tool and per session
-- [ ] Trim the tool set: drop `get_current_time` (the model can run `date`)
-- [ ] Windows support, better tests
+- [ ] `edit_file` tool
+- [ ] API keys from environment variables
+- [ ] Windows support, streaming responses, better tests
