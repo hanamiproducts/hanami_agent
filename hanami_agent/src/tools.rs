@@ -1,3 +1,4 @@
+mod edit_file;
 mod read_file;
 mod run_command;
 mod time;
@@ -27,11 +28,12 @@ pub fn specs() -> Vec<ToolSpec> {
         read_file::spec(),
         write_file::spec(),
         run_command::spec(),
+        edit_file::spec(),
     ]
 }
 
 fn needs_aproval(name: &str) -> bool {
-    matches!(name, "write_file" | "run_command")
+    matches!(name, "write_file" | "run_command" | "edit_file")
 }
 
 pub async fn execute(call: &ToolCall) -> String {
@@ -68,6 +70,7 @@ pub async fn execute(call: &ToolCall) -> String {
         "read_file" => read_file::run(&call.args).await,
         "write_file" => write_file::run(&call.args).await,
         "run_command" => run_command::run(&call.args).await,
+        "edit_file" => edit_file::run(&call.args).await,
         other => format!("Error: unknown tool '{other}'"),
     }
 }
