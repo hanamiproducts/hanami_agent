@@ -1,7 +1,9 @@
+mod configuration;
 mod helpers;
 mod providers;
 mod tools;
 
+use configuration::ConfigurationStyle;
 use helpers::{MentionCompleter, expand_mentions};
 use inquire::{Password, PasswordDisplayMode, Select, Text};
 use providers::{ChatMessage, ProviderConfig, ProviderKind, Reply};
@@ -10,38 +12,56 @@ use providers::{ChatMessage, ProviderConfig, ProviderKind, Reply};
 async fn main() {
     println!("Kuzey Agent 0.1.0");
 
-    // Ctrl+C / Esc in any prompt returns Err: exit cleanly instead of panicking.
-    let Ok(kind) = Select::new(
-        "Which provider are you going with?",
-        ProviderKind::ALL.to_vec(),
+    let Ok(env_or_manual_config) = Select::new(
+        "Will you configure the system by yourself or you will reference the env file.",
+        ConfigurationStyle::ALL.to_vec(),
     )
     .prompt() else {
         println!("Exiting...");
         return;
     };
 
-    let api_key = if kind.needs_api_key() {
-        let Ok(key) = Password::new("Please enter your API key:")
-            .with_display_mode(PasswordDisplayMode::Masked)
-            .without_confirmation()
-            .prompt()
-        else {
-            println!("Exiting...");
-            return;
-        };
-        let key = key.trim();
-        if key.is_empty() {
-            None
-        } else {
-            Some(key.to_string())
-        }
-    } else {
-        None
-    };
+    let (kind, api_key, model) = match env_or_manual_config {
+        ConfigurationStyle::Manual => {
+            // Ctrl+C / Esc in any prompt returns Err: exit cleanly instead of panicking.
+            let Ok(kind) = Select::new(
+                "Which provider are you going with?",
+                ProviderKind::ALL.to_vec(),
+            )
+            .prompt() else {
+                println!("Exiting...");
+                return;
+            };
 
-    let Ok(model) = Select::new("Which model do you want to use?", kind.models()).prompt() else {
-        println!("Exiting...");
-        return;
+            let api_key = if kind.needs_api_key() {
+                let Ok(key) = Password::new("Please enter your API key:")
+                    .with_display_mode(PasswordDisplayMode::Masked)
+                    .without_confirmation()
+                    .prompt()
+                else {
+                    println!("Exiting...");
+                    return;
+                };
+                let key = key.trim();
+                if key.is_empty() {
+                    None
+                } else {
+                    Some(key.to_string())
+                }
+            } else {
+                None
+            };
+
+            let Ok(model) = Select::new("Which model do you want to use?", kind.models()).prompt()
+            else {
+                println!("Exiting...");
+                return;
+            };
+            (kind, api_key, model)
+        }
+        ConfigurationStyle::Env => {
+            todo!()
+        }
     };
 
     let provider_details = ProviderConfig::new(kind, model.to_string(), api_key);
