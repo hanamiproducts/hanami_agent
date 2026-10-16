@@ -1,4 +1,4 @@
-# <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Kuzey Agent
+# <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Hanami Agent
 
 [![CI](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
@@ -52,7 +52,7 @@ Choose a provider, enter your API key (not needed for Ollama), choose a model an
 Lines starting with `[tool]` show the tools the model runs. Type `/exit` to quit.
 
 `run_command` uses `sh`, so it works on Linux and macOS but not on Windows yet. Even with the
-approval prompts, it's best to run Kuzey in a folder you don't mind changing.
+approval prompts, it's best to run Hanami Agent in a folder you don't mind changing.
 
 Requests to providers time out after 120 s. GLM uses the standard Z.ai endpoint; GLM Coding Plan
 keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
