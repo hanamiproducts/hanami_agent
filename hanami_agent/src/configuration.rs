@@ -1,4 +1,7 @@
 pub mod env_config;
+pub mod manual_config;
+
+use crate::providers::ProviderKind;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConfigurationStyle {
@@ -20,8 +23,12 @@ impl std::fmt::Display for ConfigurationStyle {
     }
 }
 
-impl ConfigurationStyle {
-    pub fn is_it_special(&self) -> bool {
-        matches!(self, Self::Env)
+/// Returns (kind, api_key, model), or None if the user cancelled.
+pub fn configure(
+    style: ConfigurationStyle,
+) -> Option<(ProviderKind, Option<String>, &'static str)> {
+    match style {
+        ConfigurationStyle::Env => Some(env_config::load()),
+        ConfigurationStyle::Manual => manual_config::load(),
     }
 }
