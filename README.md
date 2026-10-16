@@ -44,7 +44,7 @@ Needs Rust 1.85 or newer ([rustup](https://rustup.rs)).
 
 ```bash
 git clone https://github.com/samliumay/hanami_agent.git
-cd hanami_agent/kuzey_agent
+cd hanami_agent/hanami_agent
 cargo run --release
 ```
 
