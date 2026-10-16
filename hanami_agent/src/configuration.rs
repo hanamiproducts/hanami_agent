@@ -1,3 +1,5 @@
+pub mod env_config;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConfigurationStyle {
     Env,
@@ -15,5 +17,11 @@ impl std::fmt::Display for ConfigurationStyle {
             Self::Manual => "Manual",
         };
         write!(f, "{name}")
+    }
+}
+
+impl ConfigurationStyle {
+    pub fn is_it_special(&self) -> bool {
+        matches!(self, Self::Env)
     }
 }
