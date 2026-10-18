@@ -66,6 +66,6 @@ keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
 
 - [x] Chat loop, tool calling, approval prompts, `@file` mentions
 - [x] Gemini, Claude, OpenAI, Ollama, DeepSeek and GLM providers
-- [ ] `edit_file` tool
+- [x] `edit_file` tool
 - [ ] API keys from environment variables
 - [ ] Windows support, streaming responses, better tests
