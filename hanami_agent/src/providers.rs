@@ -2,6 +2,7 @@ mod anthropic;
 mod deepseek;
 mod glm;
 mod google;
+mod kimi;
 mod ollama;
 mod openai;
 
@@ -16,16 +17,18 @@ pub enum ProviderKind {
     OpenAI,
     Deepseek,
     GLM,
+    Kimi,
 }
 
 impl ProviderKind {
-    pub const ALL: [ProviderKind; 6] = [
+    pub const ALL: [ProviderKind; 7] = [
         Self::Ollama,
         Self::Anthropic,
         Self::Google,
         Self::OpenAI,
         Self::Deepseek,
         Self::GLM,
+        Self::Kimi,
     ];
 
     /// Models offered in the menu for this provider.
@@ -37,6 +40,7 @@ impl ProviderKind {
             Self::OpenAI => openai::all_available_models(),
             Self::Deepseek => deepseek::all_available_models(),
             Self::GLM => glm::all_available_models(),
+            Self::Kimi => kimi::all_available_models(),
         }
     }
 
@@ -61,6 +65,7 @@ impl std::fmt::Display for ProviderKind {
             Self::OpenAI => "openai",
             Self::Deepseek => "deepseek",
             Self::GLM => "glm",
+            Self::Kimi => "kimi",
         };
         write!(f, "{name}")
     }
@@ -128,5 +133,6 @@ pub async fn send(
         ProviderKind::Anthropic => anthropic::send(config, history, tools).await,
         ProviderKind::Deepseek => deepseek::send(config, history, tools).await,
         ProviderKind::GLM => glm::send(config, history, tools).await,
+        ProviderKind::Kimi => kimi::send(config, history, tools).await,
     }
 }
