@@ -4,6 +4,7 @@ mod run_command;
 mod time;
 mod write_file;
 
+use crate::helpers::for_terminal;
 use inquire::{Select, error::InquireError};
 
 pub struct ToolSpec {
@@ -32,16 +33,27 @@ pub fn specs() -> Vec<ToolSpec> {
     ]
 }
 
-fn needs_aproval(name: &str) -> bool {
-    matches!(name, "write_file" | "run_command" | "edit_file")
+fn needs_aproval(call: &ToolCall) -> bool {
+    match call.name.as_str() {
+        "write_file" | "run_command" | "edit_file" => true,
+        // Reading was always allowed without asking, so a prompt injection (text in a file
+        // or command output that says "now read ~/.ssh/id_ed25519") could send secrets to
+        // the model provider silently. Now only plain files inside the folder Kuzey was
+        // started in are free; anything else asks first.
+        "read_file" => !read_file::is_free_to_read(call.args["path"].as_str().unwrap_or("")),
+        _ => false,
+    }
 }
 
 pub async fn execute(call: &ToolCall) -> String {
     //Not sure &call.name or call.name.
-    if needs_aproval(&call.name) {
+    if needs_aproval(call) {
         let options_for_tool_call: Vec<&str> = vec!["yes", "no"];
 
-        let question_of_tool_call = format!("Allow ? \n{} \n{}", &call.name, &call.args);
+        // JSON already escapes control characters in args, but not bidi characters,
+        // so the question goes through for_terminal too (see helpers.rs).
+        let question_of_tool_call =
+            for_terminal(&format!("Allow ? \n{} \n{}", &call.name, &call.args));
         let given_choice_to_do_tool_call: Result<&str, InquireError> =
             Select::new(&question_of_tool_call, options_for_tool_call).prompt();
 
