@@ -99,9 +99,11 @@ pub fn expand_mentions(input: &str) -> String {
 /// escape codes in its answer: "\x1b[2J" clears the screen, others recolour or hide text, or
 /// write to the clipboard. Bidi characters (U+202E ...) make "rm -rf ~" look like something
 /// else. Each such character is replaced with a visible '\u{FFFD}' so nothing hides silently.
-/// Newlines and tabs are kept.
+/// Newlines and tabs are kept, and Windows line ends ("\r\n") become "\n" first; a lone '\r'
+/// (which jumps back to the start of the line and can overwrite what is shown) is replaced.
 pub fn for_terminal(text: &str) -> String {
-    text.chars()
+    text.replace("\r\n", "\n")
+        .chars()
         .map(|c| {
             let hidden_control = c.is_control() && c != '\n' && c != '\t';
             let bidi = matches!(c, '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}');
@@ -123,6 +125,11 @@ mod tests {
     fn for_terminal_replaces_escape_codes_and_bidi() {
         assert_eq!(for_terminal("a\x1b[2Jb"), "a\u{FFFD}[2Jb");
         assert_eq!(for_terminal("x\u{202E}y\r"), "x\u{FFFD}y\u{FFFD}");
+    }
+
+    #[test]
+    fn for_terminal_keeps_windows_line_ends_readable() {
+        assert_eq!(for_terminal("one\r\ntwo"), "one\ntwo");
     }
 
     #[test]
