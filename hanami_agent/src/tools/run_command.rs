@@ -3,6 +3,20 @@ use std::time::Duration;
 use tokio::process::Command;
 use serde_json::{json, Value};
 
+/// stdout and stderr are each cut to this many characters. A command like `cat big.log`
+/// or `yes` would otherwise send megabytes to the model (context overflow, real cost).
+const MAX_OUTPUT_CHARS: usize = 20_000;
+
+/// Keeps the first MAX_OUTPUT_CHARS characters and says how much was dropped.
+fn cut(text: &str) -> String {
+    let total = text.chars().count();
+    if total <= MAX_OUTPUT_CHARS {
+        return text.to_string();
+    }
+    let kept: String = text.chars().take(MAX_OUTPUT_CHARS).collect();
+    format!("{kept}\n[... cut: {} more characters]", total - MAX_OUTPUT_CHARS)
+}
+
 pub(super) fn spec() -> ToolSpec {
     ToolSpec {
         name: "run_command",
@@ -54,12 +68,29 @@ pub(super) async fn run(args: &Value) -> String {
         Ok(Ok(output)) => output,
     };
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = cut(&String::from_utf8_lossy(&output.stdout));
+    let stderr = cut(&String::from_utf8_lossy(&output.stderr));
 
     format!(
         "exit code: {}\nstdout:{stdout}\nstderr:{stderr}",
         output.status.code().map_or("killed".to_string(), |c| c.to_string())
     )
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cut_keeps_short_output() {
+        assert_eq!(cut("ok"), "ok");
+    }
+
+    #[test]
+    fn cut_shortens_long_output() {
+        let long = "a".repeat(MAX_OUTPUT_CHARS + 5);
+        let out = cut(&long);
+        assert!(out.ends_with("[... cut: 5 more characters]"), "{out}");
+    }
 }

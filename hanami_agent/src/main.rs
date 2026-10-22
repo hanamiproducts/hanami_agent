@@ -4,7 +4,7 @@ mod providers;
 mod tools;
 
 use configuration::ConfigurationStyle;
-use helpers::{MentionCompleter, expand_mentions};
+use helpers::{MentionCompleter, expand_mentions, for_terminal};
 use inquire::{Select, Text};
 use providers::{ChatMessage, ProviderConfig, Reply};
 
@@ -62,7 +62,7 @@ async fn main() {
         for _ in 0..10 {
             match providers::send(&provider_details, &history, &tool_specs).await {
                 Ok(Reply::Text(text)) => {
-                    println!("{text}");
+                    println!("{}", for_terminal(&text));
                     history.push(ChatMessage::Assistant(text));
                     was_tool_call_sucsefull = true;
                     break;
@@ -70,7 +70,7 @@ async fn main() {
                 Ok(Reply::ToolCalls { calls, reasoning }) => {
                     let mut results = Vec::new();
                     for call in &calls {
-                        println!("[tool] {} {}", call.name, call.args);
+                        println!("[tool] {} {}", for_terminal(&call.name), call.args);
                         let output = tools::execute(call).await;
                         results.push(ChatMessage::ToolResult {
                             id: call.id.clone(),
