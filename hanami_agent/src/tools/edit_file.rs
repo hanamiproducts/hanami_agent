@@ -24,7 +24,7 @@ pub(super) fn spec() -> ToolSpec {
                     "description":"The content you want to add to the file."
                 },
                 "replace_all": {
-                    "type":"bool",
+                    "type":"boolean",
                     "description": "Replace every match instead of just one. Default is false."
                 }
             },

@@ -90,7 +90,7 @@ pub(super) async fn send(
     let client = reqwest::Client::new();
 
     let response: Value = client
-        .post("https://api.moonshot.ai/v1/chat/completions)")
+        .post("https://api.moonshot.ai/v1/chat/completions")
         .timeout(Duration::from_secs(120))
         .bearer_auth(api_key)
         .json(&body)
@@ -99,7 +99,7 @@ pub(super) async fn send(
         .json()
         .await?;
 
-    if let Some(msg) = response["error"]["messages"].as_str() {
+    if let Some(msg) = response["error"]["message"].as_str() {
         return Err(format!("Kimi error: {msg}").into());
     }
 
@@ -108,7 +108,7 @@ pub(super) async fn send(
         return Err(format!("Kimi did not returned no choices: {response}").into());
     }
 
-    let answer = response["content"].as_str().unwrap_or("").to_string();
+    let answer = message["content"].as_str().unwrap_or("").to_string();
     let reasoning = message["reasoning_content"].as_str().map(|s| s.to_string());
 
     let mut calls: Vec<ToolCall> = Vec::new();
