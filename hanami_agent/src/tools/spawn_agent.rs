@@ -6,7 +6,16 @@ use serde_json::{Value, json};
 pub(super) fn spec() -> ToolSpec {
     ToolSpec {
         name: "create_subagent",
-        description: "Creates a subagent with specilized prompt and system prompt for you.",
-        parameters: json!({ "" }),
+        description: "Creates a subagent with specilized user prompt for you.",
+        parameters: json!({
+            "type": "object",
+            "properties": {
+                "user_prompt": {
+                    "type": "string",
+                    "description": "the prompt given to the subagent."
+                }
+            },
+        "required": ["user_prompt"]
+        }),
     }
 }
