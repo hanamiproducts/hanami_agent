@@ -1,4 +1,4 @@
-# <img src="https://api.iconify.design/lucide/brain-circuit.svg?color=%236e7781" width="28" alt="" /> Hanami Agent
+# <img src="./hanami-blossom.png" width="96" alt="Hanami Products blossom logo" /> Hanami Agent
 
 [![CI](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/samliumay/hanami_agent/actions/workflows/ci.yml)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
