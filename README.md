@@ -64,6 +64,7 @@ keys need the `api/coding/paas/v4` URL in `src/providers/glm.rs`.
 
 ## Roadmap
 
+- [x] Basic function calls and the base of the project.
 - [x] Chat loop, tool calling, approval prompts, `@file` mentions
 - [x] Gemini, Claude, OpenAI, Ollama, DeepSeek and GLM providers
 - [x] `edit_file` tool
